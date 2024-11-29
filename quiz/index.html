@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz Maker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        #quiz-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .option {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            word-wrap: break-word;
+        }
+        .option:hover {
+            background-color: #d0d0d0;
+        }
+        .option.selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .option.correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .option.incorrect {
+            background-color: #F44336;
+            color: white;
+        }
+        #next-btn, #restart-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        #next-btn:hover, #restart-btn:hover {
+            background-color: #1976D2;
+        }
+        #score-container {
+            display: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .option:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <div id="quiz-content">
+            <h1>Quiz Interattivo</h1>
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+            <button id="next-btn">Prossima Domanda</button>
+        </div>
+        <div id="score-container">
+            <h2>Quiz Completato!</h2>
+            <p id="final-score"></p>
+            <button id="restart-btn">Ricomicia Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        // Quiz questions 
+        const quizQuestions = [
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali",
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)",
+                    "Blocco dei salari"
+                ],
+                correctAnswer: "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Obbligo esplicito di cooperazione o almeno arbitrato finale",
+                    "Blocco dei salari",
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali"
+                ],
+                correctAnswer: "Obbligo esplicito di cooperazione o almeno arbitrato finale"
+            },
+            {
+                question: "I keynesiani hanno una:",
+                options: [
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato",
+                    "visione liberista contro l'intervento pubblico. evidenziano l'efficienza del mercato",
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato e/o i fallimenti pubblici",
+                    "visione liberista contro l'intervento pubblico, evidenziano l'efficienza del mercato e/o i fallimenti pubblici"
+                ],
+                correctAnswer: "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali",
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)",
+                    "Blocco dei salari"
+                ],
+                correctAnswer: "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Obbligo esplicito di cooperazione o almeno arbitrato finale",
+                    "Blocco dei salari",
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali"
+                ],
+                correctAnswer: "Obbligo esplicito di cooperazione o almeno arbitrato finale"
+            },
+            {
+                question: "I keynesiani hanno una:",
+                options: [
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato",
+                    "visione liberista contro l'intervento pubblico. evidenziano l'efficienza del mercato",
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato e/o i fallimenti pubblici",
+                    "visione liberista contro l'intervento pubblico, evidenziano l'efficienza del mercato e/o i fallimenti pubblici"
+                ],
+                correctAnswer: "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali",
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)",
+                    "Blocco dei salari"
+                ],
+                correctAnswer: "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Obbligo esplicito di cooperazione o almeno arbitrato finale",
+                    "Blocco dei salari",
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali"
+                ],
+                correctAnswer: "Obbligo esplicito di cooperazione o almeno arbitrato finale"
+            },
+            {
+                question: "I keynesiani hanno una:",
+                options: [
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato",
+                    "visione liberista contro l'intervento pubblico. evidenziano l'efficienza del mercato",
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato e/o i fallimenti pubblici",
+                    "visione liberista contro l'intervento pubblico, evidenziano l'efficienza del mercato e/o i fallimenti pubblici"
+                ],
+                correctAnswer: "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali",
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)",
+                    "Blocco dei salari"
+                ],
+                correctAnswer: "Scambio economico (vantaggi fiscali e economici per le parti che si accordato)"
+            },
+            {
+                question: "Quale tra le seguenti può essere definita come una politica dei redditi istituzionale?",
+                options: [
+                    "Aggravi fiscali o premi fiscali in funzione delle politiche di prezzo adottate dalle imprese (tax-based income policies)",
+                    "Obbligo esplicito di cooperazione o almeno arbitrato finale",
+                    "Blocco dei salari",
+                    "Contenimento delle dinamiche inflazionistiche \"premiato\" dal governo attraverso incentivi fiscali"
+                ],
+                correctAnswer: "Obbligo esplicito di cooperazione o almeno arbitrato finale"
+            },
+            {
+                question: "I keynesiani hanno una:",
+                options: [
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato",
+                    "visione liberista contro l'intervento pubblico. evidenziano l'efficienza del mercato",
+                    "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato e/o i fallimenti pubblici",
+                    "visione liberista contro l'intervento pubblico, evidenziano l'efficienza del mercato e/o i fallimenti pubblici"
+                ],
+                correctAnswer: "visione a favore dell'intervento pubblico, evidenziano i fallimenti del mercato"
+            }
+        ];
+
+        // Quiz state variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // DOM Elements
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const nextButton = document.getElementById('next-btn');
+        const restartButton = document.getElementById('restart-btn');
+        const quizContent = document.getElementById('quiz-content');
+        const scoreContainer = document.getElementById('score-container');
+        const finalScoreElement = document.getElementById('final-score');
+
+        // Initialize the quiz
+        function initializeQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            nextButton.style.display = 'block';
+            quizContent.style.display = 'block';
+            scoreContainer.style.display = 'none';
+            loadQuestion();
+        }
+
+        // Load a question
+        function loadQuestion() {
+            // Reset previous question state
+            optionsElement.innerHTML = '';
+            nextButton.disabled = true;
+
+            // Get current question
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+
+            // Display question
+            questionElement.textContent = currentQuestion.question;
+
+            // Create option buttons
+            currentQuestion.options.forEach(option => {
+                const optionButton = document.createElement('button');
+                optionButton.textContent = option;
+                optionButton.classList.add('option');
+                optionButton.addEventListener('click', () => selectOption(optionButton, option));
+                optionsElement.appendChild(optionButton);
+            });
+        }
+
+        // Handle option selection
+        function selectOption(selectedButton, selectedAnswer) {
+            // Disable further selections
+            const optionButtons = document.querySelectorAll('.option');
+            optionButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('selected');
+            });
+
+            // Mark selected option
+            selectedButton.classList.add('selected');
+
+            // Check answer
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+            const correctAnswer = currentQuestion.correctAnswer;
+
+            if (selectedAnswer === correctAnswer) {
+                selectedButton.classList.add('correct');
+                score++;
+            } else {
+                selectedButton.classList.add('incorrect');
+                // Highlight the correct answer
+                optionButtons.forEach(btn => {
+                    if (btn.textContent === correctAnswer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            // Enable next button
+            nextButton.disabled = false;
+        }
+
+        // Move to next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        // Show final score
+        function showFinalScore() {
+            quizContent.style.display = 'none';
+            scoreContainer.style.display = 'block';
+            finalScoreElement.textContent = `Hai totalizzato ${score} su ${quizQuestions.length} domande!`;
+        }
+
+        // Event Listeners
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', initializeQuiz);
+
+        // Start the quiz
+        initializeQuiz();
+    </script>
+</body>
+</html>
